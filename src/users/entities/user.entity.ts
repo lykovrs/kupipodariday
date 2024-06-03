@@ -1,6 +1,6 @@
 import { Entity, Column, OneToMany, JoinColumn } from 'typeorm';
 import { Content } from '../../Content';
-import { Length, IsEmail, IsUrl } from 'class-validator';
+import { Length, IsEmail, IsUrl, IsOptional } from 'class-validator';
 import { Wish } from '../../wishes/entities/wish.entity';
 import { Offer } from '../../offers/entities/offer.entity';
 import { Wishlist } from '../../wishlists/entities/wishlist.entity';
@@ -22,12 +22,14 @@ export class User extends Content {
     default: 'Пока ничего не рассказал о себе',
   })
   @Length(2, 200)
-  about: string; // информация о пользователе
+  @IsOptional()
+  about?: string; // информация о пользователе
 
   @Column({
     default: 'https://i.pravatar.cc/300',
   })
   @IsUrl()
+  @IsOptional()
   avatar: string; // ссылка на аватар
 
   @Column({
