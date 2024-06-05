@@ -1,38 +1,42 @@
-import { Body, Controller, Post, UseFilters } from '@nestjs/common';
-import { SignInDto } from './dto/signin.dto';
-import { SignUpDto } from './dto/signup.dto';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  UseFilters,
+  UseGuards,
+} from '@nestjs/common';
+
 import { ServerException } from '../exceptions/server.exception';
 import { ErrorCode } from '../exceptions/error-codes';
 import { ServerExceptionFilter } from '../filter/server-exception.filter';
+import { UsersService } from '../users/users.service';
+import { AuthService } from './auth.service';
+import { LocalGuard } from '../guards/local.guard';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @UseFilters(ServerExceptionFilter)
 @Controller('auth')
 export class AuthController {
-  private users: SignUpDto[] = [];
+  constructor(
+    private usersService: UsersService,
+    private authService: AuthService,
+  ) {}
 
   @Post('signup')
-  public signUp(@Body() signUpDto: SignUpDto) {
-    debugger;
-    if (this.users.find(({ email }) => email === signUpDto.email)) {
+  public async signUp(@Body() createUserDto: CreateUserDto) {
+    if (await this.usersService.findByEmail(createUserDto.email)) {
       throw new ServerException(ErrorCode.UserAlreadyExists);
     }
 
-    this.users.push(signUpDto);
+    const user = await this.usersService.create(createUserDto);
+
+    return this.authService.auth(user);
   }
 
+  @UseGuards(LocalGuard)
   @Post('signin')
-  public signIn(@Body() signInDto: SignInDto) {
-    debugger;
-    const user = this.users.find(
-      ({ email, password }) =>
-        email === signInDto.email && password === signInDto.password,
-    );
-
-    if (!user) {
-      debugger;
-      throw new ServerException(ErrorCode.LoginOrPasswordIncorrect);
-    }
-
-    return user;
+  public signin(@Req() req) {
+    return this.authService.auth(req.user);
   }
 }

@@ -9,21 +9,29 @@ import { User } from './entities/user.entity';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private usersRepository: Repository<User>,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return this.userRepository.create({});
+  async create(createUserDto: CreateUserDto) {
+    const user = await this.usersRepository.create(createUserDto);
+
+    return this.usersRepository.save(user);
   }
 
   async findAll() {
-    const users = await this.userRepository.find();
+    const users = await this.usersRepository.find();
 
     return users;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    const user = await this.usersRepository.findOne({
+      where: {
+        id: +id,
+      },
+    });
+
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
@@ -32,5 +40,25 @@ export class UsersService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  async findByUsername(username: string) {
+    const user = await this.usersRepository.findOne({
+      where: {
+        username,
+      },
+    });
+
+    return user;
+  }
+
+  async findByEmail(email: string) {
+    const user = await this.usersRepository.findOne({
+      where: {
+        email,
+      },
+    });
+
+    return user;
   }
 }
