@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,9 +8,15 @@ import { WishesModule } from './wishes/wishes.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
 import { OffersModule } from './offers/offers.module';
 import { AuthModule } from './auth/auth.module';
+import configuration, { schema } from './configuration';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      validationSchema: schema,
+      load: [configuration],
+      isGlobal: true,
+    }),
     WinstonModule.forRoot({
       levels: {
         critical_error: 0,
@@ -23,16 +30,20 @@ import { AuthModule } from './auth/auth.module';
         new winston.transports.File({ filename: 'error.log', level: 'error' }),
       ],
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'student',
-      password: 'student',
-      database: 'kupipodariday',
-      schema: 'kupipodariday',
-      synchronize: true,
-      autoLoadEntities: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('database.url'),
+        port: configService.get<number>('database.port'),
+        username: 'student',
+        password: 'student',
+        database: 'kupipodariday',
+        schema: 'kupipodariday',
+        synchronize: true,
+        autoLoadEntities: true,
+      }),
     }),
     AuthModule,
     UsersModule,

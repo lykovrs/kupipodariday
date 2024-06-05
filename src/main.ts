@@ -9,6 +9,12 @@ async function bootstrap() {
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.useGlobalPipes(new ValidationPipe());
 
-  await app.listen(3000);
+  const port = parseInt(process.env.PORT, 10) || 3000;
+
+  await app.listen(port);
+
+  return port;
 }
-bootstrap();
+bootstrap().then((port) => {
+  console.log('🍀🍀 Server was started on port', port, '🍀🍀');
+});

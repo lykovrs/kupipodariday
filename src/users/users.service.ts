@@ -5,6 +5,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 
+const userFields: Array<keyof User> = [
+  'id',
+  'username',
+  'avatar',
+  'about',
+  'email',
+];
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -24,7 +32,7 @@ export class UsersService {
     return users;
   }
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     const user = await this.usersRepository.findOne({
       where: {
         id: +id,
@@ -35,7 +43,7 @@ export class UsersService {
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    return this.usersRepository.save({ id, ...updateUserDto });
   }
 
   remove(id: number) {
@@ -47,6 +55,7 @@ export class UsersService {
       where: {
         username,
       },
+      select: userFields,
     });
 
     return user;
@@ -57,6 +66,7 @@ export class UsersService {
       where: {
         email,
       },
+      select: userFields,
     });
 
     return user;
