@@ -4,7 +4,6 @@ import { ServerException } from '../exceptions/server.exception';
 @Catch(ServerException)
 export class ServerExceptionFilter implements ExceptionFilter {
   catch(exception: ServerException, host: ArgumentsHost) {
-    debugger;
     const status = exception.getStatus();
     const message = exception.getResponse();
 

@@ -42,6 +42,17 @@ export class UsersService {
     return user;
   }
 
+  async findOneWithWishes(id: number) {
+    const user = await this.usersRepository.findOne({
+      where: {
+        id: +id,
+      },
+      select: ['wishes'],
+    });
+
+    return user;
+  }
+
   update(id: number, updateUserDto: UpdateUserDto) {
     return this.usersRepository.save({ id, ...updateUserDto });
   }
@@ -56,6 +67,17 @@ export class UsersService {
         username,
       },
       select: userFields,
+    });
+
+    return user;
+  }
+
+  async findWishesByUsername(username: string) {
+    const user = await this.usersRepository.findOne({
+      where: {
+        username,
+      },
+      select: ['wishes'],
     });
 
     return user;

@@ -43,6 +43,14 @@ export class UsersController {
   }
 
   @UseGuards(JwtGuard)
+  @Get('/me/wishes')
+  async getMyWishes(@Req() req) {
+    const me = await this.usersService.findOneWithWishes(req.user.id);
+
+    return me.wishes || [];
+  }
+
+  @UseGuards(JwtGuard)
   @Get(':name')
   async findOneByName(@Param('name') name: string) {
     const user = await this.usersService.findByUsername(name);
@@ -52,6 +60,18 @@ export class UsersController {
     }
 
     return user;
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':name/wishes')
+  async findWishesByName(@Param('name') name: string) {
+    const user = await this.usersService.findWishesByUsername(name);
+
+    if (!user) {
+      throw new ServerException(ErrorCode.UserNotFound);
+    }
+
+    return user.wishes || [];
   }
 
   @UseGuards(JwtGuard)
