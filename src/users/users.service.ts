@@ -50,7 +50,9 @@ export class UsersService {
       where: {
         id: +id,
       },
-      select: ['wishes'],
+      relations: {
+        wishes: true,
+      },
     });
 
     return user;
@@ -83,7 +85,9 @@ export class UsersService {
       where: {
         username,
       },
-      select: ['wishes'],
+      relations: {
+        wishes: true,
+      },
     });
 
     return user;
