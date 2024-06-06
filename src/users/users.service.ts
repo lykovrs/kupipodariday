@@ -4,24 +4,27 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-
-const userFields: Array<keyof User> = [
-  'id',
-  'username',
-  'avatar',
-  'about',
-  'email',
-];
+import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private configService: ConfigService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const user = await this.usersRepository.create(createUserDto);
+    const hash = await bcrypt.hash(
+      createUserDto.password,
+      this.configService.get<string>('jwt.saltOrRounds'),
+    );
+
+    const user = await this.usersRepository.create({
+      ...createUserDto,
+      password: hash,
+    });
 
     return this.usersRepository.save(user);
   }
@@ -53,7 +56,15 @@ export class UsersService {
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    if (updateUserDto.password) {
+      const hash = await bcrypt.hash(
+        updateUserDto.password,
+        this.configService.get<string>('jwt.saltOrRounds'),
+      );
+
+      updateUserDto.password = hash;
+    }
     return this.usersRepository.save({ id, ...updateUserDto });
   }
 
@@ -62,7 +73,6 @@ export class UsersService {
       where: {
         username,
       },
-      select: userFields,
     });
 
     return user;
@@ -93,7 +103,6 @@ export class UsersService {
         username: 'ASC',
         email: 'ASC',
       },
-      select: userFields,
     });
 
     return user;
@@ -104,7 +113,6 @@ export class UsersService {
       where: {
         email,
       },
-      select: userFields,
     });
 
     return user;

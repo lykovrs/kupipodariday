@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -25,8 +26,9 @@ export class AuthService {
   async validatePassword(username: string, password: string) {
     const user = await this.usersService.findByUsername(username);
 
-    /* В идеальном случае пароль обязательно должен быть захэширован */
-    if (user && user.password === password) {
+    const matched = await bcrypt.compare(password, user.password);
+
+    if (matched) {
       /* Исключаем пароль из результата */
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;

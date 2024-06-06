@@ -16,6 +16,7 @@ import { JwtGuard } from '../guards/auth.guard';
 import { ServerException } from '../exceptions/server.exception';
 import { ErrorCode } from '../exceptions/error-codes';
 import { FindUserDto } from './dto/find-user.dto';
+import { User } from './entities/user.entity';
 
 @UseFilters(ServerExceptionFilter)
 @Controller('users')
@@ -24,9 +25,7 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @Get('/me')
   me(@Req() req) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...user } = req.user;
-    return user;
+    return User.removePassword(req.user);
   }
 
   @UseGuards(JwtGuard)
@@ -36,10 +35,7 @@ export class UsersController {
 
     const result = { ...req.user, ...me };
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...user } = result;
-
-    return user;
+    return User.removePassword(result);
   }
 
   @UseGuards(JwtGuard)
@@ -59,7 +55,7 @@ export class UsersController {
       throw new ServerException(ErrorCode.UserNotFound);
     }
 
-    return user;
+    return User.removePassword(user);
   }
 
   @UseGuards(JwtGuard)
@@ -77,12 +73,8 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @Post('/find')
   async find(@Body() findUserDto: FindUserDto) {
-    const user = await this.usersService.findMany(findUserDto.query);
+    const users = await this.usersService.findMany(findUserDto.query);
 
-    if (!user) {
-      throw new ServerException(ErrorCode.UserNotFound);
-    }
-
-    return user;
+    return users.map((user) => User.removePassword(user));
   }
 }

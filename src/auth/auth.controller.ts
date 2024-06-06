@@ -14,6 +14,7 @@ import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { LocalGuard } from '../guards/local.guard';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { ConfigService } from '@nestjs/config';
 
 @UseFilters(ServerExceptionFilter)
 @Controller('auth')
@@ -21,6 +22,7 @@ export class AuthController {
   constructor(
     private usersService: UsersService,
     private authService: AuthService,
+    private configService: ConfigService,
   ) {}
 
   @Post('signup')

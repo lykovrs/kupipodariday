@@ -59,4 +59,10 @@ export class User extends BaseAbstractEntity {
   @OneToMany(() => Wishlist, (wishlist) => wishlist.owner)
   @JoinColumn()
   wishlists; // список вишлистов, которые создал пользователь
+
+  static removePassword(userObj: User) {
+    return Object.fromEntries(
+      Object.entries(userObj).filter(([key, val]) => key !== 'password'),
+    );
+  }
 }
