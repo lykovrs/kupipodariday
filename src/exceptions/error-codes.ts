@@ -8,6 +8,9 @@ export enum ErrorCode {
   WishCanNotEdit = 104,
   WishCanNotDelete = 105,
   OfferNotFound = 106,
+  WishlistNotFound = 107,
+  WishlistCanNotEdit = 108,
+  WishlistCanNotDelete = 109,
 }
 
 export const code2message = new Map<ErrorCode, string>([
@@ -21,6 +24,10 @@ export const code2message = new Map<ErrorCode, string>([
   [ErrorCode.WishCanNotDelete, 'You can delete only your wish'],
   // offer
   [ErrorCode.OfferNotFound, 'Offer not found'],
+  // wishlist
+  [ErrorCode.WishlistNotFound, 'Wishlist not found'],
+  [ErrorCode.WishlistCanNotEdit, 'You can edit only your wishlist'],
+  [ErrorCode.WishlistCanNotDelete, 'You can delete only your wishlist'],
 ]);
 
 export const code2status = new Map<ErrorCode, HttpStatus>([
@@ -31,4 +38,7 @@ export const code2status = new Map<ErrorCode, HttpStatus>([
   [ErrorCode.WishCanNotEdit, HttpStatus.FORBIDDEN],
   [ErrorCode.WishCanNotDelete, HttpStatus.FORBIDDEN],
   [ErrorCode.OfferNotFound, HttpStatus.NOT_FOUND],
+  [ErrorCode.WishlistNotFound, HttpStatus.NOT_FOUND],
+  [ErrorCode.WishlistCanNotEdit, HttpStatus.FORBIDDEN],
+  [ErrorCode.WishlistCanNotDelete, HttpStatus.FORBIDDEN],
 ]);
