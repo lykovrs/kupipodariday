@@ -16,7 +16,6 @@ import { Wishlist } from '../../wishlists/entities/wishlist.entity';
 @Entity()
 export class Wish extends BaseAbstractEntity {
   @PrimaryGeneratedColumn()
-  @ManyToOne(() => Wishlist, (wishlist) => wishlist.items)
   id: number;
 
   @Column({

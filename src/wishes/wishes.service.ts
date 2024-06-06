@@ -17,26 +17,53 @@ export class WishesService {
     const wish = this.wishesRepository.create({
       raised: 0,
       copied: 0,
-      owner: owner,
+      owner: User.removePassword(owner),
       ...createWishDto,
     });
 
     return this.wishesRepository.save(wish);
   }
 
+  findLast() {
+    return this.wishesRepository.find({
+      skip: 0,
+      take: 1,
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+  }
+
+  async findOne(id: number) {
+    const wish = await this.wishesRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        owner: true,
+      },
+    });
+
+    if (wish) delete wish.owner.password;
+
+    return wish;
+  }
+
+  update(id: number, updateWishDto: UpdateWishDto) {
+    return this.wishesRepository.save({ id, ...updateWishDto });
+  }
+
   findAll() {
     return `This action returns all wishes`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} wish`;
-  }
-
-  update(id: number, updateWishDto: UpdateWishDto) {
-    return `This action updates a #${id} wish`;
-  }
-
   remove(id: number) {
-    return `This action removes a #${id} wish`;
+    return this.wishesRepository.delete({
+      id,
+    });
+  }
+
+  async copy(owner: User, wish: CreateWishDto) {
+    return this.create(owner, wish);
   }
 }

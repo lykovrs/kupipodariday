@@ -17,7 +17,6 @@ import { ServerException } from '../exceptions/server.exception';
 import { ErrorCode } from '../exceptions/error-codes';
 import { FindUserDto } from './dto/find-user.dto';
 import { User } from './entities/user.entity';
-import { JoinTable } from 'typeorm';
 
 @UseFilters(ServerExceptionFilter)
 @Controller('users')
