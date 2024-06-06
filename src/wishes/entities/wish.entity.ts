@@ -1,4 +1,4 @@
-import { Content } from '../../Content';
+import { BaseAbstractEntity } from '../../BaseAbstractEntity';
 import { User } from '../../users/entities/user.entity';
 import {
   Column,
@@ -8,13 +8,13 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { IsUrl, Length } from 'class-validator';
+import { IsOptional, IsUrl, Length } from 'class-validator';
 import { Offer } from '../../offers/entities/offer.entity';
 import { Wishlist } from '../../wishlists/entities/wishlist.entity';
 
 // Схема для подарков
 @Entity()
-export class Wish extends Content {
+export class Wish extends BaseAbstractEntity {
   @PrimaryGeneratedColumn()
   @ManyToOne(() => Wishlist, (wishlist) => wishlist.items)
   id: number;
@@ -25,6 +25,11 @@ export class Wish extends Content {
   })
   @Length(1, 250)
   name: string; // название подарка
+
+  @Column()
+  @IsUrl()
+  @IsOptional()
+  image?: string; // ссылка на изображение подарка
 
   @Column()
   @IsUrl()

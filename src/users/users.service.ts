@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -57,10 +57,6 @@ export class UsersService {
     return this.usersRepository.save({ id, ...updateUserDto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
-
   async findByUsername(username: string) {
     const user = await this.usersRepository.findOne({
       where: {
@@ -78,6 +74,26 @@ export class UsersService {
         username,
       },
       select: ['wishes'],
+    });
+
+    return user;
+  }
+
+  async findMany(query: string) {
+    const user = await this.usersRepository.find({
+      where: [
+        {
+          email: Like(`%${query}%`),
+        },
+        {
+          username: Like(`%${query}%`),
+        },
+      ],
+      order: {
+        username: 'ASC',
+        email: 'ASC',
+      },
+      select: userFields,
     });
 
     return user;

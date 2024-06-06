@@ -1,4 +1,4 @@
-import { Content } from '../../Content';
+import { BaseAbstractEntity } from '../../BaseAbstractEntity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { IsUrl, Length } from 'class-validator';
@@ -6,7 +6,7 @@ import { Wish } from '../../wishes/entities/wish.entity';
 
 // Cхема списка подарков
 @Entity()
-export class Wishlist extends Content {
+export class Wishlist extends BaseAbstractEntity {
   @Column({
     type: 'varchar',
     length: 250,

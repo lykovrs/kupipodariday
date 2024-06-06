@@ -1,6 +1,6 @@
-import { IsEmail } from 'class-validator';
+import { Length } from 'class-validator';
 
 export class FindUserDto {
-  @IsEmail()
-  public query: string; // адрес электронной почты пользователя
+  @Length(1, 150)
+  public query: string; // адрес электронной почты или имя пользователя
 }

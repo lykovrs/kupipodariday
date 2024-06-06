@@ -4,7 +4,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export abstract class Content {
+export abstract class BaseAbstractEntity {
   @PrimaryGeneratedColumn()
   id: number; // уникальный числовой идентификатор
   @CreateDateColumn()

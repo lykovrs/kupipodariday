@@ -1,13 +1,19 @@
 import { Entity, Column, OneToMany, JoinColumn } from 'typeorm';
-import { Content } from '../../Content';
-import { Length, IsEmail, IsUrl, IsOptional } from 'class-validator';
+import { BaseAbstractEntity } from '../../BaseAbstractEntity';
+import {
+  Length,
+  IsEmail,
+  IsUrl,
+  IsOptional,
+  IsNotEmpty,
+} from 'class-validator';
 import { Wish } from '../../wishes/entities/wish.entity';
 import { Offer } from '../../offers/entities/offer.entity';
 import { Wishlist } from '../../wishlists/entities/wishlist.entity';
 
 // Схема пользователя
 @Entity()
-export class User extends Content {
+export class User extends BaseAbstractEntity {
   @Column({
     type: 'varchar',
     length: 30,
@@ -41,6 +47,7 @@ export class User extends Content {
   @Column()
   password: string; // пароль пользователя
 
+  @IsNotEmpty()
   @OneToMany(() => Wish, (wish) => wish.owner)
   @JoinColumn()
   wishes: Wish; // список желаемых подарков

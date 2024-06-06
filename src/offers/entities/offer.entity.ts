@@ -1,11 +1,11 @@
-import { Content } from '../../Content';
+import { BaseAbstractEntity } from '../../BaseAbstractEntity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Wish } from '../../wishes/entities/wish.entity';
 
 // Схема желающих скинуться
 @Entity()
-export class Offer extends Content {
+export class Offer extends BaseAbstractEntity {
   @ManyToOne(() => User, (user) => user.offers)
   user: User; // содержит желающего скинуться
 

@@ -77,7 +77,7 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @Post('/find')
   async find(@Body() findUserDto: FindUserDto) {
-    const user = await this.usersService.findByEmail(findUserDto.query);
+    const user = await this.usersService.findMany(findUserDto.query);
 
     if (!user) {
       throw new ServerException(ErrorCode.UserNotFound);
