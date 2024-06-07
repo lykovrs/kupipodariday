@@ -58,7 +58,9 @@ export class WishesService {
 
     if (wish) delete wish.owner.password;
 
-    return wish;
+    const offers = wish.offers.filter((offer) => !offer.hidden);
+
+    return { ...wish, offers };
   }
 
   updateRaise(id: number, raise: number) {

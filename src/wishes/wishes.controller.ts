@@ -26,7 +26,6 @@ export class WishesController {
     return this.wishesService.create(req.user, createWishDto);
   }
 
-  @UseGuards(JwtGuard)
   @Get('/last')
   async findLast() {
     const last = await this.wishesService.findLast();
@@ -34,7 +33,6 @@ export class WishesController {
     return last;
   }
 
-  @UseGuards(JwtGuard)
   @Get('/top')
   async findTop() {
     const top = await this.wishesService.findTop();
