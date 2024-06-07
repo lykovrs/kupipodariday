@@ -1,7 +1,7 @@
 import { BaseAbstractEntity } from '../../BaseAbstractEntity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { IsUrl, Length } from 'class-validator';
+import { IsOptional, IsUrl, Length } from 'class-validator';
 import { Wish } from '../../wishes/entities/wish.entity';
 
 // Cхема списка подарков
@@ -15,10 +15,12 @@ export class Wishlist extends BaseAbstractEntity {
   name: string; // название подарка
 
   @Column({
+    nullable: true,
     type: 'varchar',
     length: 1500,
   })
   @Length(1, 1500)
+  @IsOptional()
   description: string; // описание подборки
 
   @Column()

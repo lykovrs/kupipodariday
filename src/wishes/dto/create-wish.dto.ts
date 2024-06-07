@@ -22,5 +22,6 @@ export class CreateWishDto {
   price: number; // стоимость подарка
 
   @Length(1, 1024)
-  description: string; // строка с описанием подарка
+  @IsOptional()
+  description?: string; // строка с описанием подарка
 }

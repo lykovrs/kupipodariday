@@ -31,21 +31,15 @@ export class WishesController {
   async findLast() {
     const last = await this.wishesService.findLast();
 
-    if (!last.length) {
-      throw new ServerException(ErrorCode.WishNotFound);
-    }
-    return last[0];
+    return last;
   }
 
   @UseGuards(JwtGuard)
   @Get('/top')
   async findTop() {
-    const last = await this.wishesService.findLast();
+    const top = await this.wishesService.findTop();
 
-    if (!last.length) {
-      throw new ServerException(ErrorCode.WishNotFound);
-    }
-    return last[0];
+    return top;
   }
 
   @UseGuards(JwtGuard)
@@ -77,6 +71,7 @@ export class WishesController {
     return this.wishesService.update(+id, updateWishDto);
   }
 
+  @UseGuards(JwtGuard)
   @Get()
   findAll() {
     return this.wishesService.findAll();
@@ -109,7 +104,7 @@ export class WishesController {
 
     const { name, image, description, link, price } = wish;
 
-    return await this.wishesService.copy(req.user, {
+    return await this.wishesService.copy(+id, req.user, {
       name,
       image,
       description,

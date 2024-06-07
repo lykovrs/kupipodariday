@@ -52,7 +52,8 @@ export class Wish extends BaseAbstractEntity {
     length: 1024,
   })
   @Length(1, 1024)
-  description: string; // строка с описанием подарка
+  @IsOptional()
+  description?: string; // строка с описанием подарка
 
   @OneToMany(() => Offer, (offer) => offer.id)
   @JoinColumn()

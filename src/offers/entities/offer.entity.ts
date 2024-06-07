@@ -1,5 +1,5 @@
 import { BaseAbstractEntity } from '../../BaseAbstractEntity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Wish } from '../../wishes/entities/wish.entity';
 
@@ -7,9 +7,11 @@ import { Wish } from '../../wishes/entities/wish.entity';
 @Entity()
 export class Offer extends BaseAbstractEntity {
   @ManyToOne(() => User, (user) => user.offers)
+  @JoinColumn()
   user: User; // содержит желающего скинуться
 
   @ManyToOne(() => Wish, (wish) => wish.offers)
+  @JoinColumn()
   item: Wish; // содержит ссылку на товар
 
   @Column({

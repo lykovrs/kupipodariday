@@ -18,18 +18,35 @@ export class OffersService {
       ...createOfferDto,
       user,
     });
-    return this.offerRepository.save(offer);
+
+    await this.offerRepository.save(offer);
+
+    return {
+      ...offer,
+      user: User.removePassword(offer.user),
+    };
   }
 
-  findAll() {
-    return this.offerRepository.find({ relations: { user: true, item: true } });
+  async findAll() {
+    const offers = await this.offerRepository.find({
+      relations: { user: true, item: true },
+    });
+
+    offers.forEach((offer) => delete offer.user.password);
+
+    return offers;
   }
 
-  findOne(id: number) {
-    return this.offerRepository.findOne({
+  async findOne(id: number) {
+    const offer = await this.offerRepository.findOne({
       where: { id },
       relations: { user: true, item: true },
     });
+
+    return {
+      ...offer,
+      user: User.removePassword(offer.user),
+    };
   }
 
   update(id: number, updateOfferDto: UpdateOfferDto) {

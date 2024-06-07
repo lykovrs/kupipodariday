@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Wish } from './entities/wish.entity';
 import { User } from '../users/entities/user.entity';
 
@@ -11,6 +11,7 @@ export class WishesService {
   constructor(
     @InjectRepository(Wish)
     private wishesRepository: Repository<Wish>,
+    private dataSource: DataSource,
   ) {}
 
   async create(owner: User, createWishDto: CreateWishDto) {
@@ -27,9 +28,19 @@ export class WishesService {
   findLast() {
     return this.wishesRepository.find({
       skip: 0,
-      take: 1,
+      take: 40,
       order: {
         createdAt: 'DESC',
+      },
+    });
+  }
+
+  findTop() {
+    return this.wishesRepository.find({
+      skip: 0,
+      take: 20,
+      order: {
+        copied: 'DESC',
       },
     });
   }
@@ -63,7 +74,22 @@ export class WishesService {
     });
   }
 
-  async copy(owner: User, wish: CreateWishDto) {
-    return this.create(owner, wish);
+  async copy(id: number, owner: User, wish: CreateWishDto) {
+    let mywish: Wish | null = null;
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      await this.wishesRepository.increment({ id }, 'copied', 1);
+      mywish = await this.create(owner, wish);
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
+
+    return mywish;
   }
 }
