@@ -1,5 +1,5 @@
 import { BaseAbstractEntity } from '../../BaseAbstractEntity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { IsOptional, IsUrl, Length } from 'class-validator';
 import { Wish } from '../../wishes/entities/wish.entity';
@@ -27,9 +27,9 @@ export class Wishlist extends BaseAbstractEntity {
   @IsUrl()
   image: string; // обложка для подборки
 
-  @OneToMany(() => Wish, (wish) => wish.id)
-  @JoinColumn()
-  items: Wish; // набор ссылок на подарки
+  @ManyToMany(() => Wish)
+  @JoinTable()
+  items: Wish[]; // набор ссылок на подарки
 
   @ManyToOne(() => User, (user) => user.wishlists)
   owner: User; // создатель подборки

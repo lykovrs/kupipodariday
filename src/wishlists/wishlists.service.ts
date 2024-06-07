@@ -17,6 +17,7 @@ export class WishlistsService {
     const wish = this.wishlistRepository.create({
       owner: User.removePassword(owner),
       ...createWishlistDto,
+      items: createWishlistDto.itemsId.map((id) => ({ id })),
     });
 
     return this.wishlistRepository.save(wish);
@@ -42,7 +43,7 @@ export class WishlistsService {
       },
       relations: {
         owner: true,
-        // items: true,
+        items: true,
       },
     });
 

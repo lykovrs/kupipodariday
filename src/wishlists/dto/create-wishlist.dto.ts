@@ -1,4 +1,4 @@
-import { IsOptional, IsUrl, Length } from 'class-validator';
+import { IsOptional, IsUrl, Length, IsArray } from 'class-validator';
 
 export class CreateWishlistDto {
   @Length(1, 250)
@@ -8,4 +8,6 @@ export class CreateWishlistDto {
   description: string; // описание подборки
   @IsUrl()
   image: string; // обложка для подборки
+  @IsArray()
+  itemsId: number[]; // идентификаторы хотелок
 }

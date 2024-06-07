@@ -1,22 +1,12 @@
 import { BaseAbstractEntity } from '../../BaseAbstractEntity';
 import { User } from '../../users/entities/user.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { IsOptional, IsUrl, Length } from 'class-validator';
 import { Offer } from '../../offers/entities/offer.entity';
 
 // Схема для подарков
 @Entity()
 export class Wish extends BaseAbstractEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
   @Column({
     type: 'varchar',
     length: 250,
