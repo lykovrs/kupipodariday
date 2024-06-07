@@ -14,9 +14,7 @@ export class Offer extends BaseAbstractEntity {
   @JoinColumn()
   item: Wish; // содержит ссылку на товар
 
-  @Column({
-    type: 'money',
-  })
+  @Column('decimal', { precision: 16, scale: 2 })
   amount: number; // сумма заявки
 
   @Column({

@@ -26,7 +26,7 @@ export class WishlistsService {
     const wishlists = await this.wishlistRepository.find({
       relations: {
         owner: true,
-        // items: true,
+        items: true,
       },
     });
 

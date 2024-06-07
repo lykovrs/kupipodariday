@@ -52,12 +52,17 @@ export class WishesService {
       },
       relations: {
         owner: true,
+        offers: true,
       },
     });
 
     if (wish) delete wish.owner.password;
 
     return wish;
+  }
+
+  updateRaise(id: number, raise: number) {
+    return this.wishesRepository.save({ id, raised: raise });
   }
 
   update(id: number, updateWishDto: UpdateWishDto) {

@@ -65,7 +65,11 @@ export class WishesController {
     }
 
     if (wish.owner.id !== req.user.id) {
-      throw new ServerException(ErrorCode.WishCanNotEdit);
+      throw new ServerException(ErrorCode.WishCanEditOwn);
+    }
+
+    if (wish.offers.length) {
+      throw new ServerException(ErrorCode.WishCanNotEditWithOffers);
     }
 
     return this.wishesService.update(+id, updateWishDto);

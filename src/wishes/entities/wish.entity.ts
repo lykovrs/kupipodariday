@@ -10,7 +10,6 @@ import {
 } from 'typeorm';
 import { IsOptional, IsUrl, Length } from 'class-validator';
 import { Offer } from '../../offers/entities/offer.entity';
-import { Wishlist } from '../../wishlists/entities/wishlist.entity';
 
 // Схема для подарков
 @Entity()
@@ -34,14 +33,10 @@ export class Wish extends BaseAbstractEntity {
   @IsUrl()
   link: string; // ссылка на интернет-магазин, в котором можно приобрести подарок
 
-  @Column({
-    type: 'money',
-  })
+  @Column('decimal', { precision: 16, scale: 2 })
   price: number; // стоимость подарка
 
-  @Column({
-    type: 'money',
-  })
+  @Column('decimal', { precision: 16, scale: 2 })
   raised: number; // сумма предварительного сбора или сумма, которую пользователи сейчас готовы скинуть на подарок
 
   @ManyToOne(() => User, (user) => user.wishes)
@@ -55,9 +50,9 @@ export class Wish extends BaseAbstractEntity {
   @IsOptional()
   description?: string; // строка с описанием подарка
 
-  @OneToMany(() => Offer, (offer) => offer.id)
+  @OneToMany(() => Offer, (offer) => offer.item)
   @JoinColumn()
-  offers: Offer; // массив ссылок на заявки скинуться от других пользователей
+  offers: Offer[]; // массив ссылок на заявки скинуться от других пользователей
 
   @Column({
     type: 'numeric',
