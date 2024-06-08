@@ -13,8 +13,6 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ServerExceptionFilter } from '../filter/server-exception.filter';
 import { JwtGuard } from '../guards/auth.guard';
-import { ServerException } from '../exceptions/server.exception';
-import { ErrorCode } from '../exceptions/error-codes';
 import { FindUserDto } from './dto/find-user.dto';
 import { User } from './entities/user.entity';
 
@@ -30,8 +28,8 @@ export class UsersController {
 
   @UseGuards(JwtGuard)
   @Patch('/me')
-  async updateMe(@Req() req, @Body() updateUserDto: UpdateUserDto) {
-    return await this.usersService.update(req.user, updateUserDto);
+  updateMe(@Req() req, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(req.user, updateUserDto);
   }
 
   @UseGuards(JwtGuard)
@@ -44,14 +42,8 @@ export class UsersController {
 
   @UseGuards(JwtGuard)
   @Get(':name')
-  async findOneByName(@Param('name') name: string) {
-    const user = await this.usersService.findByUsername(name);
-
-    if (!user) {
-      throw new ServerException(ErrorCode.UserNotFound);
-    }
-
-    return User.removePassword(user);
+  findOneByName(@Param('name') name: string) {
+    return this.usersService.findByUsername(name);
   }
 
   @UseGuards(JwtGuard)
@@ -59,18 +51,12 @@ export class UsersController {
   async findWishesByName(@Param('name') name: string) {
     const user = await this.usersService.findWishesByUsername(name);
 
-    if (!user) {
-      throw new ServerException(ErrorCode.UserNotFound);
-    }
-
     return user.wishes || [];
   }
 
   @UseGuards(JwtGuard)
   @Post('/find')
-  async find(@Body() findUserDto: FindUserDto) {
-    const users = await this.usersService.findMany(findUserDto.query);
-
-    return users.map((user) => User.removePassword(user));
+  find(@Body() findUserDto: FindUserDto) {
+    return this.usersService.findMany(findUserDto.query);
   }
 }

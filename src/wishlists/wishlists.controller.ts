@@ -13,8 +13,6 @@ import { WishlistsService } from './wishlists.service';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import { JwtGuard } from '../guards/auth.guard';
-import { ServerException } from '../exceptions/server.exception';
-import { ErrorCode } from '../exceptions/error-codes';
 
 @Controller('wishlistlists')
 export class WishlistsController {
@@ -34,47 +32,23 @@ export class WishlistsController {
 
   @UseGuards(JwtGuard)
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const wishlist = await this.wishlistsService.findOne(+id);
-    if (!wishlist) {
-      throw new ServerException(ErrorCode.WishlistNotFound);
-    }
-    return wishlist;
+  findOne(@Param('id') id: string) {
+    return this.wishlistsService.findOne(+id);
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id')
-  async update(
+  update(
     @Req() req,
     @Param('id') id: string,
     @Body() updateWishlistDto: UpdateWishlistDto,
   ) {
-    const wishlist = await this.wishlistsService.findOne(+id);
-    if (!wishlist) {
-      throw new ServerException(ErrorCode.WishlistNotFound);
-    }
-
-    if (wishlist.owner.id !== req.user.id) {
-      throw new ServerException(ErrorCode.WishlistCanNotEdit);
-    }
-
-    return this.wishlistsService.update(+id, updateWishlistDto);
+    return this.wishlistsService.update(+id, updateWishlistDto, req.user.id);
   }
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  async remove(@Req() req, @Param('id') id: string) {
-    const wishlist = await this.wishlistsService.findOne(+id);
-    if (!wishlist) {
-      throw new ServerException(ErrorCode.WishlistNotFound);
-    }
-
-    if (wishlist.owner.id !== req.user.id) {
-      throw new ServerException(ErrorCode.WishlistCanNotDelete);
-    }
-
-    await this.wishlistsService.remove(+id);
-
-    return wishlist;
+  remove(@Req() req, @Param('id') id: string) {
+    return this.wishlistsService.remove(+id, req.user.id);
   }
 }

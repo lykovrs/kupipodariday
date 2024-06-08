@@ -40,18 +40,20 @@ export class UsersService {
     }
   }
 
-  async findAll() {
-    const users = await this.usersRepository.find();
-
-    return users;
+  findAll() {
+    return this.usersRepository.find();
   }
 
   async findOne(id: number) {
     const user = await this.usersRepository.findOne({
       where: {
-        id: +id,
+        id,
       },
     });
+
+    if (!user) {
+      throw new ServerException(ErrorCode.UserNotFound);
+    }
 
     return user;
   }
@@ -59,12 +61,16 @@ export class UsersService {
   async findOneWithWishes(id: number) {
     const user = await this.usersRepository.findOne({
       where: {
-        id: +id,
+        id,
       },
       relations: {
         wishes: true,
       },
     });
+
+    if (!user) {
+      throw new ServerException(ErrorCode.UserNotFound);
+    }
 
     return user;
   }
@@ -94,14 +100,18 @@ export class UsersService {
     }
   }
 
-  async findByUsername(username: string) {
+  async findByUsername(username: string, withPassword = false) {
     const user = await this.usersRepository.findOne({
       where: {
         username,
       },
     });
 
-    return user;
+    if (!user) {
+      throw new ServerException(ErrorCode.UserNotFound);
+    }
+
+    return !withPassword ? User.removePassword(user) : user;
   }
 
   async findWishesByUsername(username: string) {
@@ -114,11 +124,15 @@ export class UsersService {
       },
     });
 
+    if (!user) {
+      throw new ServerException(ErrorCode.UserNotFound);
+    }
+
     return user;
   }
 
   async findMany(query: string) {
-    const user = await this.usersRepository.find({
+    const users = await this.usersRepository.find({
       where: [
         {
           email: Like(`%${query}%`),
@@ -133,16 +147,6 @@ export class UsersService {
       },
     });
 
-    return user;
-  }
-
-  async findByEmail(email: string) {
-    const user = await this.usersRepository.findOne({
-      where: {
-        email,
-      },
-    });
-
-    return user;
+    return users.map((user) => User.removePassword(user));
   }
 }

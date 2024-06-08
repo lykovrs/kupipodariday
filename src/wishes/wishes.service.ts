@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Wish } from './entities/wish.entity';
 import { User } from '../users/entities/user.entity';
+import { ServerException } from '../exceptions/server.exception';
+import { ErrorCode } from '../exceptions/error-codes';
 
 @Injectable()
 export class WishesService {
@@ -56,32 +58,57 @@ export class WishesService {
       },
     });
 
+    if (!wish) {
+      throw new ServerException(ErrorCode.WishNotFound);
+    }
+
     if (wish) delete wish.owner.password;
 
-    const offers = wish.offers.filter((offer) => !offer.hidden);
+    const offers = wish.offers?.filter((offer) => !offer.hidden) || [];
 
-    return { ...wish, offers };
+    return { ...wish, offers, offersCount: wish.offers?.length };
   }
 
   updateRaise(id: number, raise: number) {
     return this.wishesRepository.save({ id, raised: raise });
   }
 
-  update(id: number, updateWishDto: UpdateWishDto) {
-    return this.wishesRepository.save({ id, ...updateWishDto });
+  async update(id: number, updateWishDto: UpdateWishDto, editorId: number) {
+    const wish = await this.findOne(id);
+
+    if (wish.owner.id !== editorId) {
+      throw new ServerException(ErrorCode.WishCanEditOwn);
+    }
+
+    if (wish.offersCount) {
+      throw new ServerException(ErrorCode.WishCanNotEditWithOffers);
+    }
+
+    await this.wishesRepository.save({ id, ...updateWishDto });
+
+    return { ...wish, ...updateWishDto };
   }
 
-  findAll() {
-    return `This action returns all wishes`;
-  }
+  async remove(id: number, editorId: number) {
+    const wish = await this.findOne(id);
 
-  remove(id: number) {
-    return this.wishesRepository.delete({
+    if (!wish) {
+      throw new ServerException(ErrorCode.WishNotFound);
+    }
+
+    if (wish.owner.id !== editorId) {
+      throw new ServerException(ErrorCode.WishCanNotDelete);
+    }
+    await this.wishesRepository.delete({
       id,
     });
+
+    return wish;
   }
 
-  async copy(id: number, owner: User, wish: CreateWishDto) {
+  async copy(id: number, owner: User) {
+    const originalWish = await this.findOne(id);
+
     let mywish: Wish | null = null;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -89,7 +116,16 @@ export class WishesService {
 
     try {
       await this.wishesRepository.increment({ id }, 'copied', 1);
-      mywish = await this.create(owner, wish);
+
+      const { name, image, description, link, price } = originalWish;
+
+      mywish = await this.create(owner, {
+        name,
+        image,
+        description,
+        link,
+        price,
+      });
       await queryRunner.commitTransaction();
     } catch (err) {
       await queryRunner.rollbackTransaction();

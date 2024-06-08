@@ -13,8 +13,6 @@ import { WishesService } from './wishes.service';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { JwtGuard } from '../guards/auth.guard';
-import { ServerException } from '../exceptions/server.exception';
-import { ErrorCode } from '../exceptions/error-codes';
 
 @Controller('wishes')
 export class WishesController {
@@ -27,91 +25,40 @@ export class WishesController {
   }
 
   @Get('/last')
-  async findLast() {
-    const last = await this.wishesService.findLast();
-
-    return last;
+  findLast() {
+    return this.wishesService.findLast();
   }
 
   @Get('/top')
-  async findTop() {
-    const top = await this.wishesService.findTop();
-
-    return top;
+  findTop() {
+    return this.wishesService.findTop();
   }
 
   @UseGuards(JwtGuard)
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const wish = await this.wishesService.findOne(+id);
-    if (!wish) {
-      throw new ServerException(ErrorCode.WishNotFound);
-    }
-    return wish;
+  findOne(@Param('id') id: string) {
+    return this.wishesService.findOne(+id);
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id')
-  async update(
+  update(
     @Req() req,
     @Param('id') id: string,
     @Body() updateWishDto: UpdateWishDto,
   ) {
-    const wish = await this.wishesService.findOne(+id);
-    if (!wish) {
-      throw new ServerException(ErrorCode.WishNotFound);
-    }
-
-    if (wish.owner.id !== req.user.id) {
-      throw new ServerException(ErrorCode.WishCanEditOwn);
-    }
-
-    if (wish.offers.length) {
-      throw new ServerException(ErrorCode.WishCanNotEditWithOffers);
-    }
-
-    return this.wishesService.update(+id, updateWishDto);
-  }
-
-  @UseGuards(JwtGuard)
-  @Get()
-  findAll() {
-    return this.wishesService.findAll();
+    return this.wishesService.update(+id, updateWishDto, req.user.id);
   }
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  async remove(@Req() req, @Param('id') id: string) {
-    const wish = await this.wishesService.findOne(+id);
-    if (!wish) {
-      throw new ServerException(ErrorCode.WishNotFound);
-    }
-
-    if (wish.owner.id !== req.user.id) {
-      throw new ServerException(ErrorCode.WishCanNotDelete);
-    }
-
-    await this.wishesService.remove(+id);
-
-    return wish;
+  remove(@Req() req, @Param('id') id: string) {
+    return this.wishesService.remove(+id, req.user.id);
   }
 
   @UseGuards(JwtGuard)
   @Post(':id/copy')
-  async copy(@Req() req, @Param('id') id: string) {
-    const wish = await this.wishesService.findOne(+id);
-    if (!wish) {
-      throw new ServerException(ErrorCode.WishNotFound);
-    }
-
-    const { name, image, description, link, price } = wish;
-
-    return await this.wishesService.copy(+id, req.user, {
-      name,
-      image,
-      description,
-      link,
-      price,
-    });
+  copy(@Req() req, @Param('id') id: string) {
+    return this.wishesService.copy(+id, req.user);
   }
 }

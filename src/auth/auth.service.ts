@@ -16,15 +16,13 @@ export class AuthService {
   auth(user: User) {
     const secretOrKey = this.configService.get<string>('jwt.secret');
     const payload = { sub: user.id };
-    const res = {
+    return {
       access_token: this.jwtService.sign(payload, { secret: secretOrKey }),
     };
-
-    return res;
   }
 
   async validatePassword(username: string, password: string) {
-    const user = await this.usersService.findByUsername(username);
+    const user = await this.usersService.findByUsername(username, true);
 
     if (!user) return null;
 

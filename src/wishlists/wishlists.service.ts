@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Wishlist } from './entities/wishlist.entity';
 import { User } from '../users/entities/user.entity';
+import { ServerException } from '../exceptions/server.exception';
+import { ErrorCode } from '../exceptions/error-codes';
 
 @Injectable()
 export class WishlistsService {
@@ -37,7 +39,7 @@ export class WishlistsService {
   }
 
   async findOne(id: number) {
-    const wish = await this.wishlistRepository.findOne({
+    const wishlist = await this.wishlistRepository.findOne({
       where: {
         id: id,
       },
@@ -47,16 +49,36 @@ export class WishlistsService {
       },
     });
 
-    if (wish) delete wish.owner.password;
+    if (!wishlist) {
+      throw new ServerException(ErrorCode.WishlistNotFound);
+    }
 
-    return wish;
+    if (wishlist) delete wishlist.owner.password;
+
+    return wishlist;
   }
 
-  update(id: number, updateWishlistDto: UpdateWishlistDto) {
-    return this.wishlistRepository.save({ id, ...updateWishlistDto });
+  async update(
+    id: number,
+    updateWishlistDto: UpdateWishlistDto,
+    editorId: number,
+  ) {
+    const wishlist = await this.findOne(+id);
+
+    if (wishlist.owner.id !== editorId) {
+      throw new ServerException(ErrorCode.WishlistCanNotEdit);
+    }
+
+    await this.wishlistRepository.save({ id, ...updateWishlistDto });
+
+    return { ...wishlist, ...updateWishlistDto };
   }
 
-  remove(id: number) {
+  async remove(id: number, editorId: number) {
+    const wishlist = await this.findOne(+id);
+    if (wishlist.owner.id !== editorId) {
+      throw new ServerException(ErrorCode.WishlistCanNotDelete);
+    }
     return this.wishlistRepository.delete({
       id,
     });
