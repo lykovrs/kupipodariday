@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 
 export enum ErrorCode {
+  SomethingWrong = 99,
   LoginOrPasswordIncorrect = 100,
   UserAlreadyExists,
   UserNotFound = 102,
@@ -17,9 +18,13 @@ export enum ErrorCode {
 }
 
 export const code2message = new Map<ErrorCode, string>([
+  [ErrorCode.SomethingWrong, 'Something is wrong... Try it later.'],
   // user
   [ErrorCode.LoginOrPasswordIncorrect, 'Login or password is incorrect'],
-  [ErrorCode.UserAlreadyExists, 'User already exists'],
+  [
+    ErrorCode.UserAlreadyExists,
+    'User with current email or username already exists',
+  ],
   [ErrorCode.UserNotFound, 'User not found'],
   // wish
   [ErrorCode.WishNotFound, 'Wish not found'],
@@ -40,6 +45,7 @@ export const code2message = new Map<ErrorCode, string>([
 ]);
 
 export const code2status = new Map<ErrorCode, HttpStatus>([
+  [ErrorCode.SomethingWrong, HttpStatus.INTERNAL_SERVER_ERROR],
   [ErrorCode.LoginOrPasswordIncorrect, HttpStatus.BAD_REQUEST],
   [ErrorCode.UserAlreadyExists, HttpStatus.BAD_REQUEST],
   [ErrorCode.UserNotFound, HttpStatus.NOT_FOUND],

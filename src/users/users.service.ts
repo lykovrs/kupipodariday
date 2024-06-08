@@ -6,6 +6,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { ServerException } from '../exceptions/server.exception';
+import { ErrorCode } from '../exceptions/error-codes';
 
 @Injectable()
 export class UsersService {
@@ -16,17 +18,26 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const hash = await bcrypt.hash(
-      createUserDto.password,
-      this.configService.get<string>('jwt.saltOrRounds'),
-    );
+    try {
+      const hash = await bcrypt.hash(
+        createUserDto.password,
+        this.configService.get<string>('jwt.saltOrRounds'),
+      );
 
-    const user = await this.usersRepository.create({
-      ...createUserDto,
-      password: hash,
-    });
+      const user = await this.usersRepository.create({
+        ...createUserDto,
+        password: hash,
+      });
 
-    return this.usersRepository.save(user);
+      await this.usersRepository.save(user);
+
+      return User.removePassword(user);
+    } catch (e) {
+      if (e.code === '23505')
+        throw new ServerException(ErrorCode.UserAlreadyExists);
+
+      throw new ServerException(ErrorCode.SomethingWrong);
+    }
   }
 
   async findAll() {
@@ -58,16 +69,29 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    if (updateUserDto.password) {
-      const hash = await bcrypt.hash(
-        updateUserDto.password,
-        this.configService.get<string>('jwt.saltOrRounds'),
-      );
+  async update(user: User, updateUserDto: UpdateUserDto) {
+    try {
+      if (updateUserDto.password) {
+        const hash = await bcrypt.hash(
+          updateUserDto.password,
+          this.configService.get<string>('jwt.saltOrRounds'),
+        );
 
-      updateUserDto.password = hash;
+        updateUserDto.password = hash;
+      }
+
+      const result = await this.usersRepository.save({
+        id: user.id,
+        ...updateUserDto,
+      });
+
+      return User.removePassword({ ...user, ...result });
+    } catch (e) {
+      if (e.code === '23505')
+        throw new ServerException(ErrorCode.UserAlreadyExists);
+
+      throw new ServerException(ErrorCode.SomethingWrong);
     }
-    return this.usersRepository.save({ id, ...updateUserDto });
   }
 
   async findByUsername(username: string) {

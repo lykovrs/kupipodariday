@@ -63,6 +63,6 @@ export class User extends BaseAbstractEntity {
   static removePassword(userObj: User) {
     return Object.fromEntries(
       Object.entries(userObj).filter(([key]) => key !== 'password'),
-    );
+    ) as User;
   }
 }

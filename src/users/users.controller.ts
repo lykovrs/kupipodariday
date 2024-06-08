@@ -31,11 +31,7 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @Patch('/me')
   async updateMe(@Req() req, @Body() updateUserDto: UpdateUserDto) {
-    const me = await this.usersService.update(req.user.id, updateUserDto);
-
-    const result = { ...req.user, ...me };
-
-    return User.removePassword(result);
+    return await this.usersService.update(req.user, updateUserDto);
   }
 
   @UseGuards(JwtGuard)
