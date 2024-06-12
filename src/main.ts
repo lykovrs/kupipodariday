@@ -3,6 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ValidationPipe } from '@nestjs/common';
+import { version } from '../package.json';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -10,7 +11,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('КупиПодариДай')
     .setDescription('API cервиса вишлистов')
-    .setVersion('1.0')
+    .setVersion(version)
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
