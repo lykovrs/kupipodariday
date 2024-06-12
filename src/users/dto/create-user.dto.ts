@@ -6,6 +6,12 @@ import {
   IsOptional,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import {
+  USER_DESCRIPTION_MAX_LENGTH,
+  USER_DESCRIPTION_MIN_LENGTH,
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+} from '../users.constants';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -22,11 +28,11 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'имя пользователя',
-    minimum: 2,
-    maximum: 30,
+    minimum: USERNAME_MIN_LENGTH,
+    maximum: USERNAME_MAX_LENGTH,
   })
-  @Length(2, 30)
-  public username?: string; // имя пользователя
+  @Length(USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH)
+  public username?: string;
 
   @ApiProperty({
     description: 'ссылка на аватар',
@@ -38,11 +44,11 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'информация о пользователе',
-    minimum: 2,
-    maximum: 200,
+    minimum: USER_DESCRIPTION_MIN_LENGTH,
+    maximum: USER_DESCRIPTION_MAX_LENGTH,
     required: false,
   })
-  @Length(2, 200)
+  @Length(USER_DESCRIPTION_MIN_LENGTH, USER_DESCRIPTION_MAX_LENGTH)
   @IsOptional()
   about?: string;
 }

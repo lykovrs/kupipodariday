@@ -11,46 +11,54 @@ import { Wish } from '../../wishes/entities/wish.entity';
 import { Offer } from '../../offers/entities/offer.entity';
 import { Wishlist } from '../../wishlists/entities/wishlist.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import {
+  USER_DESCRIPTION_MAX_LENGTH,
+  USER_DESCRIPTION_MIN_LENGTH,
+  USER_DESCRIPTION_DEFAULT_TEXT,
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+  USER_AVATAR_DEFAULT_LINK,
+} from '../users.constants';
 
 // Схема пользователя
 @Entity()
 export class User extends BaseAbstractEntity {
   @ApiProperty({
     description: 'имя пользователя',
-    minimum: 2,
-    maximum: 30,
+    minimum: USERNAME_MIN_LENGTH,
+    maximum: USERNAME_MAX_LENGTH,
   })
   @Column({
     type: 'varchar',
-    length: 30,
+    length: USERNAME_MAX_LENGTH,
     unique: true,
   })
-  @Length(2, 30)
+  @Length(USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH)
   username: string;
 
   @ApiProperty({
     description: 'информация о пользователе',
-    minimum: 2,
-    maximum: 200,
+    minimum: USER_DESCRIPTION_MIN_LENGTH,
+    maximum: USER_DESCRIPTION_MAX_LENGTH,
     required: false,
-    default: 'Пока ничего не рассказал о себе',
+    default: USER_DESCRIPTION_DEFAULT_TEXT,
   })
   @Column({
     type: 'varchar',
-    length: 200,
-    default: 'Пока ничего не рассказал о себе',
+    length: USER_DESCRIPTION_MAX_LENGTH,
+    default: USER_DESCRIPTION_DEFAULT_TEXT,
   })
-  @Length(2, 200)
+  @Length(USER_DESCRIPTION_MIN_LENGTH, USER_DESCRIPTION_MAX_LENGTH)
   @IsOptional()
   about?: string;
 
   @ApiProperty({
     description: 'ссылка на аватар',
     required: false,
-    default: 'https://i.pravatar.cc/300',
+    default: USER_AVATAR_DEFAULT_LINK,
   })
   @Column({
-    default: 'https://i.pravatar.cc/300',
+    default: USER_AVATAR_DEFAULT_LINK,
   })
   @IsUrl()
   @IsOptional()
