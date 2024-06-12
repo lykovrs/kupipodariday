@@ -15,11 +15,19 @@ import { ServerExceptionFilter } from '../filter/server-exception.filter';
 import { JwtGuard } from '../guards/auth.guard';
 import { FindUserDto } from './dto/find-user.dto';
 import { User } from './entities/user.entity';
+import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
 @UseFilters(ServerExceptionFilter)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+  @ApiExtraModels(User)
+  @ApiResponse({
+    status: 201,
+    description: 'Пользователь успешно создан.',
+    schema: { $ref: getSchemaPath(User) },
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
   @UseGuards(JwtGuard)
   @Get('/me')
   me(@Req() req) {

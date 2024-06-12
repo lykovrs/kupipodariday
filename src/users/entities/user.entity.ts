@@ -10,18 +10,31 @@ import {
 import { Wish } from '../../wishes/entities/wish.entity';
 import { Offer } from '../../offers/entities/offer.entity';
 import { Wishlist } from '../../wishlists/entities/wishlist.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 // Схема пользователя
 @Entity()
 export class User extends BaseAbstractEntity {
+  @ApiProperty({
+    description: 'имя пользователя',
+    minimum: 2,
+    maximum: 30,
+  })
   @Column({
     type: 'varchar',
     length: 30,
     unique: true,
   })
   @Length(2, 30)
-  username: string; // имя пользователя
+  username: string;
 
+  @ApiProperty({
+    description: 'информация о пользователе',
+    minimum: 2,
+    maximum: 200,
+    required: false,
+    default: 'Пока ничего не рассказал о себе',
+  })
   @Column({
     type: 'varchar',
     length: 200,
@@ -29,20 +42,28 @@ export class User extends BaseAbstractEntity {
   })
   @Length(2, 200)
   @IsOptional()
-  about?: string; // информация о пользователе
+  about?: string;
 
+  @ApiProperty({
+    description: 'ссылка на аватар',
+    required: false,
+    default: 'https://i.pravatar.cc/300',
+  })
   @Column({
     default: 'https://i.pravatar.cc/300',
   })
   @IsUrl()
   @IsOptional()
-  avatar: string; // ссылка на аватар
+  avatar: string;
 
+  @ApiProperty({
+    description: 'адрес электронной почты пользователя',
+  })
   @Column({
     unique: true,
   })
   @IsEmail()
-  email: string; // адрес электронной почты пользователя
+  email: string;
 
   @Column()
   password: string; // пароль пользователя
