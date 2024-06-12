@@ -37,7 +37,7 @@ export class UsersController {
   async getMyWishes(@Req() req) {
     const me = await this.usersService.findOneWithWishes(req.user.id);
 
-    return me.wishes || [];
+    return me?.wishes || [];
   }
 
   @UseGuards(JwtGuard)
@@ -51,7 +51,7 @@ export class UsersController {
   async findWishesByName(@Param('name') name: string) {
     const user = await this.usersService.findWishesByUsername(name);
 
-    return user.wishes || [];
+    return user?.wishes || [];
   }
 
   @UseGuards(JwtGuard)
