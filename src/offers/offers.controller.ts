@@ -13,7 +13,10 @@ import { JwtGuard } from '../guards/auth.guard';
 import { ServerException } from '../exceptions/server.exception';
 import { ErrorCode } from '../exceptions/error-codes';
 import { WishesService } from '../wishes/wishes.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('offers')
+@ApiBearerAuth()
 @Controller('offers')
 export class OffersController {
   constructor(

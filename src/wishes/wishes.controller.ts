@@ -13,7 +13,10 @@ import { WishesService } from './wishes.service';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { JwtGuard } from '../guards/auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('wishes')
+@ApiBearerAuth()
 @Controller('wishes')
 export class WishesController {
   constructor(private readonly wishesService: WishesService) {}

@@ -12,9 +12,12 @@ async function bootstrap() {
     .setTitle('КупиПодариДай')
     .setDescription('API cервиса вишлистов')
     .setVersion(version)
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: { persistAuthorization: true },
+  });
 
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.useGlobalPipes(new ValidationPipe({ transform: true }));

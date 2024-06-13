@@ -15,31 +15,48 @@ import { ServerExceptionFilter } from '../filter/server-exception.filter';
 import { JwtGuard } from '../guards/auth.guard';
 import { FindUserDto } from './dto/find-user.dto';
 import { User } from './entities/user.entity';
-import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiResponse,
+  getSchemaPath,
+  ApiTags,
+  ApiOkResponse,
+  ApiBearerAuth,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { Wish } from '../wishes/entities/wish.entity';
 
+@ApiTags('users')
+@ApiBearerAuth()
 @UseFilters(ServerExceptionFilter)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-  @ApiExtraModels(User)
-  @ApiResponse({
-    status: 201,
-    description: 'Пользователь успешно создан.',
-    schema: { $ref: getSchemaPath(User) },
+  @ApiOkResponse({
+    description: 'Пользователь',
+    type: User,
   })
-  @ApiResponse({ status: 403, description: 'Forbidden.' })
   @UseGuards(JwtGuard)
   @Get('/me')
   me(@Req() req) {
     return User.removePassword(req.user);
   }
 
+  @ApiOkResponse({
+    description: 'Пользователь',
+    type: User,
+  })
   @UseGuards(JwtGuard)
   @Patch('/me')
   updateMe(@Req() req, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(req.user, updateUserDto);
   }
 
+  @ApiOkResponse({
+    description: 'Мои подарки',
+    type: Wish,
+    isArray: true,
+  })
   @UseGuards(JwtGuard)
   @Get('/me/wishes')
   async getMyWishes(@Req() req) {
@@ -48,12 +65,21 @@ export class UsersController {
     return me?.wishes || [];
   }
 
+  @ApiOkResponse({
+    description: 'Пользователь',
+    type: User,
+  })
   @UseGuards(JwtGuard)
   @Get(':name')
   findOneByName(@Param('name') name: string) {
     return this.usersService.findByUsername(name);
   }
 
+  @ApiOkResponse({
+    description: 'Подарки пользователя',
+    type: Wish,
+    isArray: true,
+  })
   @UseGuards(JwtGuard)
   @Get(':name/wishes')
   async findWishesByName(@Param('name') name: string) {
@@ -62,6 +88,10 @@ export class UsersController {
     return user?.wishes || [];
   }
 
+  @ApiOkResponse({
+    description: 'Пользователь',
+    type: User,
+  })
   @UseGuards(JwtGuard)
   @Post('/find')
   find(@Body() findUserDto: FindUserDto) {

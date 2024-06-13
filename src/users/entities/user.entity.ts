@@ -10,7 +10,7 @@ import {
 import { Wish } from '../../wishes/entities/wish.entity';
 import { Offer } from '../../offers/entities/offer.entity';
 import { Wishlist } from '../../wishlists/entities/wishlist.entity';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import {
   USER_DESCRIPTION_MAX_LENGTH,
   USER_DESCRIPTION_MIN_LENGTH,
@@ -25,6 +25,7 @@ import {
 export class User extends BaseAbstractEntity {
   @ApiProperty({
     description: 'имя пользователя',
+    example: 'lykovrs',
     minimum: USERNAME_MIN_LENGTH,
     maximum: USERNAME_MAX_LENGTH,
   })
@@ -38,6 +39,7 @@ export class User extends BaseAbstractEntity {
 
   @ApiProperty({
     description: 'информация о пользователе',
+    example: 'About lykovrs.',
     minimum: USER_DESCRIPTION_MIN_LENGTH,
     maximum: USER_DESCRIPTION_MAX_LENGTH,
     required: false,
@@ -54,6 +56,7 @@ export class User extends BaseAbstractEntity {
 
   @ApiProperty({
     description: 'ссылка на аватар',
+    example: USER_AVATAR_DEFAULT_LINK,
     required: false,
     default: USER_AVATAR_DEFAULT_LINK,
   })
@@ -66,15 +69,16 @@ export class User extends BaseAbstractEntity {
 
   @ApiProperty({
     description: 'адрес электронной почты пользователя',
+    example: 'lykovrs@gmail.com',
   })
   @Column({
     unique: true,
   })
   @IsEmail()
   email: string;
-
+  @ApiHideProperty()
   @Column()
-  password: string; // пароль пользователя
+  password: string;
 
   @IsNotEmpty()
   @OneToMany(() => Wish, (wish) => wish.owner)
